@@ -34,7 +34,7 @@ void setScaling() { scaling = (float)width/2000*zoom; }
 // File
 String svgFiles[];
 String povFiles[];
-String sourceFile = "DAF.svg";
+String sourceFile;
 
 // Colors
 color backgroundColor = color(0,0,0);
@@ -54,7 +54,7 @@ float innerCurviness = 0.01;
 float outerCurviness = 1;
 
 // Generated Shape
-float outerShapeScaling = 14;
+float outerShapeScaling = 17;
 float outerShapeTwistZ = 0;
 float outerShapeTwistX = 0;
 float outerShapeTwistY = 0;
@@ -709,11 +709,12 @@ void setup() {
 	// ControlP5
 	svgFiles = new File(sketchPath() + "/data").list();
 	povFiles = new File(sketchPath() + "/pov").list();
+	sourceFile = svgFiles[0];
 	controlFrame = new ControlFrame(this, 847, 847, "Controls");
 	
 	// Camera 
 	setCam();
 	
 	// DAF
-	daf = new Wavizator("DAF.svg");
+	daf = new Wavizator(sourceFile);
 }
