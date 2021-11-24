@@ -8,14 +8,14 @@ class Wave {
 	// set wave settings
 	void setWave(int getnSubwaves, int getNPoints) {
 		// get
-		this.nPoints = getNPoints;								// total # of waves to add together
+		this.nPoints = getNPoints;									// total # of waves to add together
 		this.nSubwaves = getnSubwaves;								// number of datapoints in the waves
 		// setup
-		this.theta = new float[nSubwaves];	   					// Store different time values and parallel universes
+		this.theta = new float[nSubwaves];	   						// Store different time values and parallel universes
 		this.speeds = new float[nSubwaves];      					// Store different speeds for each waves
 		this.amplitude = new float[nSubwaves];   					// Height of wave
 		this.dx = new float[nSubwaves];          					// Value for incrementing X, to be calculated as a function of period and xspacing
-		this.yvalues = new float [nPoints];  	  				// Using an array to store height values for the wave
+		this.yvalues = new float [nPoints];  	  					// Using an array to store height values for the wave
 		this.xspacing = 100;										// How far apart should each horizontal location be spaced (will this be necessary ?)
 
 		for (int i = 0; i < nSubwaves; i++) {
@@ -32,7 +32,7 @@ class Wave {
 			this.theta[waveIndex] += this.speeds[waveIndex]*pow(waveSpeed, 2);
 			float x = this.theta[waveIndex];
 			for (int i = 0; i < nPoints; i++) {
-				if (waveIndex % 2 == 0)  this.yvalues[i] += sin(x)*this.amplitude[waveIndex];	// Alternate between sine and cosine
+				if (waveIndex % 2 == 0)  this.yvalues[i] += sin(x)*this.amplitude[waveIndex]*pow(waveScale, 2)/4;	// Alternate between sine and cosine
 				else this.yvalues[i] += cos(x)*this.amplitude[waveIndex]*pow(waveScale, 2)/4;
 				x+=this.dx[waveIndex];
 			}

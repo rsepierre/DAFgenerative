@@ -1,10 +1,15 @@
 import processing.svg.*;
 
 import java.util.*;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import geomerative.*;
 import controlP5.*;
-import peasy.PeasyCam;
+import peasy.*;
 
 PeasyCam camera;
 int record = 0;
@@ -14,6 +19,8 @@ ControlFrame controlFrame;
 PGraphics renderer;
 
 Wavizator daf;
+boolean isRendering;
+RenderQueue renderQueue;
 
 // Redimensionner
 float scaling = 1;
@@ -26,44 +33,45 @@ void setScaling() { scaling = (float)width/2000*zoom; }
 
 // File
 String svgFiles[];
+String povFiles[];
 String sourceFile = "DAF.svg";
 
 // Colors
-color backgroundColor = color(255,255,255);
-color innerStrokeColor = color(0, 0, 255);
-color outerStrokeColor = color(255, 0, 0);
+color backgroundColor = color(0,0,0);
+color innerStrokeColor = color(255, 255, 255);
+color outerStrokeColor = color(255, 255, 255);
 
 // StrokeWeight
-float innerStrokeWidth = 2;
-float outerStrokeWidth = 2;
+float innerStrokeWidth = 1.5;
+float outerStrokeWidth = 0;
 
 // Alpha
 float innerStrokeAlpha = 10;
-float outerStrokeAlpha = 0;
+float outerStrokeAlpha = 10;
 
 // Curviness
 float innerCurviness = 0.01;
 float outerCurviness = 1;
 
 // Generated Shape
-float outerShapeScaling = 1.25;
-float outerShapeTwistZ = 0.25;
-float outerShapeTwistX = 0.01;
-float outerShapeTwistY = 0.01;
-float outerShapeGeometry = 0.5;
+float outerShapeScaling = 2;
+float outerShapeTwistZ = 0;
+float outerShapeTwistX = 0;
+float outerShapeTwistY = 0;
+float outerShapeGeometry = 0.1;
 
 // Waves
 int nWaves = 4;
-float waveLength = 4;
+float waveLength = 5;
 float waveScale = 1;
-float waveSpeed = 1;
+float waveSpeed = 0.5;
 
 // Poygonizer
-int subdivision = 5;
+int subdivision = 0;
 
 // Blending
-int numberOfSteps = 20;
-float blendingHeight = 200;
+int numberOfSteps = 15;
+float blendingHeight = 100;
 
 // ControlP5
 int margin = 15;
@@ -142,7 +150,10 @@ class ControlFrame extends PApplet {
 		fieldX = sideMargin;
 		Button capturePNGButton = cp5.addButton("PNG").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capturePNG);
 		fieldX += fieldWidth/2 + 4;
-		// Button captureSVGButton = cp5.addButton("SVG RAW").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capture3D);
+		Button captureSuperButton = cp5.addButton("super").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureSuper);
+		fieldY += fieldHeight+4;
+		fieldX = sideMargin;
+		Button savePOVButton = cp5.addButton("savePOV").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(savePOV);
 
 		// Inner Stroke
 		fieldY = sideMargin;
@@ -355,6 +366,55 @@ CallbackListener capture3D = new CallbackListener() { public void controlEvent(C
 CallbackListener capturePNG = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
 	record = 3;
 }};
+CallbackListener captureSuper = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+	println("List of SVGs");
+	println(svgFiles);
+	println("List of POVs");
+	println(povFiles);
+	for (int i = 0; i < svgFiles.length; i++) {	
+		for (int j = 0; j < povFiles.length; j++) {
+			renderQueue.add("png",svgFiles[i],povFiles[j]);
+		}
+	}
+	
+}};
+
+CallbackListener savePOV = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+	CameraState pov = camera.getState();
+	String path = sketchPath() + "/pov/POV-" + millis() + ".pov";
+	File file = new File(path);
+	try {
+		FileOutputStream f = new FileOutputStream(file);
+		ObjectOutputStream o = new ObjectOutputStream(f);
+		o.writeObject(pov);
+		o.close();
+		println("POV saved : " + file.getAbsolutePath() );
+	} catch (Exception e) {
+       e.printStackTrace();
+	   println("Error saving POV : " + file.getAbsolutePath() );
+    }
+	
+	
+}};
+
+CameraState readPOV(String filename) {
+	CameraState pov;
+	String path = sketchPath() + "/pov/" + filename;
+	File file = new File(path);
+	try {
+		FileInputStream fi = new FileInputStream(file);
+		ObjectInputStream oi = new ObjectInputStream(fi);
+		pov = (CameraState) oi.readObject();
+		oi.close();
+		fi.close();
+		println("POV loaded : " + file.getAbsolutePath() );
+		return (CameraState)pov;
+	} catch (Exception e) {
+       e.printStackTrace();
+	   println("Error loading POV" + file.getAbsolutePath() );
+	   return camera.getState();
+    }
+}
 
 CallbackListener selectRecommended = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
 	CheckBox checkBoxes = cp5.get(CheckBox.class, "checkBoxes");
@@ -478,10 +538,11 @@ class Wavizator { //badass name
 		try {
 			for (int i = 0; i < this.nShapes; i++) {
 				if (waveSpeed != 0) { this.waves[i].calc(); }
-					addwave(this.outerShapes.get(i), this.outerWavyShapes.get(i), this.waves[i].getWave() );
-					blendShapes(this.coreShapes.get(i), this.outerWavyShapes.get(i));
-			}	
+				addwave(this.outerShapes.get(i), this.outerWavyShapes.get(i), this.waves[i].getWave() );
+				blendShapes(this.coreShapes.get(i), this.outerWavyShapes.get(i));
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			println("Calcs and Rendering not synchronized, frame skipped");
 		}
 	}
@@ -567,7 +628,9 @@ void drawShape(ArrayList<PVector> shape, float getZ, float getCurviness, float g
 	int nPoints = shape.size();
 	if (nPoints >= 0) {
 		// Drawing Settings
-		beginShape(); noFill();
+		beginShape();
+		// noFill();
+		fill(backgroundColor);
 		stroke(getColor, getAlpha);
 		strokeWeight(getStrokeWidth*scaling);
 		curveTightness(1-getCurviness);
@@ -586,16 +649,29 @@ void drawShape(ArrayList<PVector> shape, float getZ, float getCurviness, float g
 	}
 }
 
+
+void draw() {
+	isRendering = (renderQueue.modes.size() > 0);
+	int currentHeight = height;
+	int currentWidth = width;
+	if(isRendering) {
+		renderQueue.startRender();
+	}
+
+	background(backgroundColor);
+	translate(width/2, height/2);
+	daf.render();
+
+	if(isRendering) {
+		renderQueue.saveRender();
+	}
+}
+
 // Setup camera
 void setCam() {
 	camera = new PeasyCam(this, width/2, height/2, 0, height);
 	camera.setViewport(0, 0, width, height);
 	camera.feed();
-}
-
-void settings() {
-	size(1500, 1000, P3D);
-	pixelDensity(displayDensity());
 }
 
 // Detect Resize
@@ -609,47 +685,19 @@ void pre() {
 	}
 }
 
-void draw() {
-	int currentHeight = height;
-	int currentWidth = width;
-	int startrecord = record; // synchronise framerate with button clic
-	if (startrecord == 1) {
-		println("start 2D SVG export...");
-		beginRecord(SVG, "export/export2D-####.svg");
-	} else if (startrecord == 2) {
-		println("start 3D SVG export...");
-		beginRaw(SVG, "export/export3D-####.svg");
-		hint(ENABLE_DEPTH_SORT);
-	} else if (startrecord == 3) {
-		renderer.beginDraw();
-		renderer.background(backgroundColor);
-		println("starting PNG HD export...");
-	}
-
-	background(backgroundColor);
-
-	// Draw Scene
-	translate(width/2, height/2);
-	daf.render();
-
-	if (startrecord == 1) { 
-		endRecord();
-	} else if (startrecord == 2) {
-		endRaw();
-	} else if (startrecord == 3) {
-		renderer.save("export/exportPNG-" + frameCount + ".png");
-		renderer.endDraw();
-	}
-	if (startrecord > 0) {
-		println("export finished !");
-		record = 0;
-	}
+void settings() {
+	size(1500, 1000, P3D);
+	pixelDensity(displayDensity());
 }
 
 void setup() {
 	// Settings
 	surface.setResizable(true);
 	registerMethod("pre", this);
+	renderer = createGraphics(3000, 2000, P3D);
+	renderQueue = new RenderQueue();
+
+	hint(DISABLE_ASYNC_SAVEFRAME);
 
 	// Geomerative
 	RG.init(this);
@@ -657,8 +705,8 @@ void setup() {
 
 	// ControlP5
 	svgFiles = new File(sketchPath() + "/data").list();
+	povFiles = new File(sketchPath() + "/pov").list();
 	controlFrame = new ControlFrame(this, 847, 847, "Controls");
-	renderer = createGraphics(3000, 2000, P3D);
 	
 	// Camera 
 	setCam();
