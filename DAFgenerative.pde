@@ -54,11 +54,11 @@ float innerCurviness = 0.01;
 float outerCurviness = 1;
 
 // Generated Shape
-float outerShapeScaling = 10;
+float outerShapeScaling = 14;
 float outerShapeTwistZ = 0;
 float outerShapeTwistX = 0;
 float outerShapeTwistY = 0;
-float outerShapeGeometry = 0.1;
+float outerShapeCircleness = 0.4;
 
 // Waves
 int nWaves = 4;
@@ -207,7 +207,7 @@ class ControlFrame extends PApplet {
 		fieldX = sideMargin*3+fieldWidth*2;
 		Textlabel outerShapeTitle = cp5.addTextlabel("outerShapeTitle").setText("OuterShape").setFont(arialBig).setPosition(fieldX,fieldY);
 		fieldY += fieldHeight + margin+10;
-		Slider outerShapeGeometrySlider = ezSlider("outerShapeGeometry", "Circleness", 0, 1).setValue(outerShapeGeometry).onChange(changeOuterParams);
+		Slider outerShapeCirclenessSlider = ezSlider("outerShapeCircleness", "Circleness", 0, 1).setValue(outerShapeCircleness).onChange(changeOuterParams);
 		Slider outerShapeTwistZSlider = ezSlider("outerShapeTwistZ", "Twist Z", -2, 2).setValue(outerShapeTwistZ);
 		Slider outerShapeTwistXSlider = ezSlider("outerShapeTwistX", "Twist X", -2, 2).setValue(outerShapeTwistX);
 		Slider outerShapeTwistYSlider = ezSlider("outerShapeTwistY", "Twist Y", -2, 2).setValue(outerShapeTwistY);
@@ -295,7 +295,7 @@ void randomize() {
 	if (checkValues[11] == 1) { randomizeSlider("outerCurviness"); }
 	if (checkValues[12] == 1) { randomizeSlider("subdivision"); }
 	if (checkValues[13] == 1) { randomizeSlider("waveScale"); }
-	if (checkValues[14] == 1) { randomizeSlider("outerShapeGeometry"); }
+	if (checkValues[14] == 1) { randomizeSlider("outerShapeCircleness"); }
 	if (checkValues[15] == 1) { randomizeSlider("numberOfSteps"); }
 	if (checkValues[16] == 1) { randomizeSlider("waveLength"); }
 	if (checkValues[17] == 1) { randomizeSlider("outerShapeTwistZ"); }
@@ -520,7 +520,7 @@ class Wavizator { //badass name
 	void setupOuter() {
 		this.outerShapes = new ArrayList<ArrayList<PVector>>();
 		for (int i = 0; i < this.nShapes; i++) {
-			this.outerShapes.add(proceduralShape(coreShapes.get(i), centroids.get(i), outerShapeScaling, outerShapeGeometry));
+			this.outerShapes.add(proceduralShape(coreShapes.get(i), centroids.get(i), outerShapeScaling, outerShapeCircleness));
 		}
 	this.setupWaves(); } /*
 	↓ */
@@ -574,14 +574,17 @@ ArrayList<PVector> proceduralShape(ArrayList<PVector> seedShape, PVector seedCen
 
 void addwave(ArrayList<PVector> originShape, ArrayList<PVector> targetShape, float[] wave) {
 	int nPoints = originShape.size();
+	float difference = wave[0] - wave[nPoints-1]; // get the difference between first and last point
 	if (targetShape.size() == 0) {
 		for (int i = 0; i < (nPoints); i++) {
 			targetShape.add(new PVector());
 		}
 	}
+
+
 	for (int i = 0; i < (nPoints); i++) {
 		PVector point =	originShape.get(i).copy();
-		float yVal = (wave[i] + wave[(i+2)%nPoints] + 2*wave[(i+1)%nPoints] )/4;
+		float yVal = wave[i] + difference/nPoints*i;
 		point.setMag((point.mag()+yVal));
 		targetShape.get(i).set(point);
 	}
