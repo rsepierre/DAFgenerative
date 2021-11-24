@@ -478,7 +478,7 @@ class Wavizator { //badass name
 	// Imports new SVG
 	void setSource(String svgSource) {
 		this.source = RG.loadShape(svgSource);
-		this.source.centerIn(g, 100, 1, 1);
+		// this.source.centerIn(g, 100, 1, 1); if you want to force shape resize
 	this.setPolygon(); } /*
 	↓ */
 	void setPolygon() {
