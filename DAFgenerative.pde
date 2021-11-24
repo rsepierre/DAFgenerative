@@ -54,7 +54,7 @@ float innerCurviness = 0.01;
 float outerCurviness = 1;
 
 // Generated Shape
-float outerShapeScaling = 2;
+float outerShapeScaling = 10;
 float outerShapeTwistZ = 0;
 float outerShapeTwistX = 0;
 float outerShapeTwistY = 0;
@@ -189,7 +189,7 @@ class ControlFrame extends PApplet {
 		Slider subdivisionSlider = ezSlider("subdivision", "Subdivision (*)", -10, 10).setValue(subdivision).onChange(changePolygon);
 		Slider numberOfStepsSlider = ezSlider("numberOfSteps", "Number of Lines (*)", 1, 200).setValue(numberOfSteps);
 		Slider blendingHeightSlider = ezSlider("blendingHeight", "Depth", -1500, 1500).setValue(blendingHeight);
-		Slider outerShapeScalingSlider = ezSlider("outerShapeScaling", "Spread", 0, 5).setValue(outerShapeScaling).onChange(changeOuterParams);
+		Slider outerShapeScalingSlider = ezSlider("outerShapeScaling", "Spread", -50, 50).setValue(outerShapeScaling).onChange(changeOuterParams);
 
 		// Wave Settings
 		fieldY = 290;
@@ -566,7 +566,7 @@ ArrayList<PVector> proceduralShape(ArrayList<PVector> seedShape, PVector seedCen
 	for (int i = 0; i < (nPoints); i++) {
 		PVector direction = seedShape.get(i).copy().sub(seedCentroid);
 		float newMag = lerp(direction.mag(), averageMag, getShapeness);
-		direction.setMag(newMag*multiplier);
+		direction.setMag(newMag+(multiplier*abs(multiplier)*scaling));
 		proceduralShape.add(seedCentroid.copy().add(direction));
 	}
 	return proceduralShape;
