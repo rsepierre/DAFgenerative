@@ -24,12 +24,12 @@ RenderQueue renderQueue;
 
 // Redimensionner
 float scaling = 1;
-float zoom = 1;
 void setScaling() { scaling = (float)width/2000*zoom; }
 
 /* Controllable Variables */
 
 // Zoom
+float zoom = 1;
 
 // File
 String svgFiles[];

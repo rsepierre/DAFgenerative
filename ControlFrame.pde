@@ -47,6 +47,7 @@ Slider nWavesSlider;
 Slider outerShapeTwistYSlider;
 
 // Scrollable lists
+ScrollableList povSelector;
 ScrollableList fileSelector;
 
 // Buttons
@@ -121,6 +122,9 @@ class ControlFrame extends PApplet {
 		backgroundColorPicker.getCaptionLabel().setVisible(true).align(ControlP5.LEFT, ControlP5.TOP_OUTSIDE).setPaddingX(0);
 		fieldY += 60+margin;
 		zoomSlider = ezSlider("zoom", "Zoom", 0, 3).setValue(zoom).onChange(changeZoom);
+		povSelector = cp5.addScrollableList("Choose POV").setPosition(fieldX,fieldY-25).setSize(fieldWidth,round(fieldHeight*5.2)).setBarHeight(fieldHeight).setItemHeight(fieldHeight).onEnter(toFront).onChange(changePOV)
+		.addItems( Arrays.asList(povFiles) );
+		povSelector.close();
 		fileSelector = cp5.addScrollableList("sourceFile").setPosition(fieldX,fieldY).setSize(fieldWidth,round(fieldHeight*5.2)).setBarHeight(fieldHeight).setItemHeight(fieldHeight).onEnter(toFront).onChange(changeSource)
 		.addItems( Arrays.asList(svgFiles) );
 		fileSelector.close();
@@ -251,10 +255,19 @@ CallbackListener toFront = new CallbackListener() {
 	}
 };
 
+CallbackListener changePOV = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+	String newPOV = (String)povSelector.getItem( (int)povSelector.getValue() ).get("name");
+	camera.setState( readPOV(newPOV), 0 );
+	povFiles = new File(sketchPath() + "/pov").list();
+	povSelector.setItems( Arrays.asList(povFiles) );
+}};
+
 CallbackListener changeSource = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
 	ScrollableList dropdown = cp5.get(ScrollableList.class, "sourceFile");
-	String newSource = (String)dropdown.getItem( (int)dropdown.getValue() ).get("name");
+	String newSource = (String)fileSelector.getItem( (int)fileSelector.getValue() ).get("name");
 	daf.setSource(newSource);
+	svgFiles = new File(sketchPath() + "/data").list();
+	fileSelector.setItems( Arrays.asList(svgFiles) );
 }};
 
 CallbackListener changePolygon = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
@@ -311,39 +324,10 @@ CallbackListener captureSuper = new CallbackListener() { public void controlEven
 }};
 
 CallbackListener savePOV = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
-	CameraState pov = camera.getState();
-	String path = sketchPath() + "/pov/POV-" + millis() + ".pov";
-	File file = new File(path);
-	try {
-		FileOutputStream f = new FileOutputStream(file);
-		ObjectOutputStream o = new ObjectOutputStream(f);
-		o.writeObject(pov);
-		o.close();
-		println("POV saved : " + file.getAbsolutePath() );
-	} catch (Exception e) {
-       e.printStackTrace();
-	   println("Error saving POV : " + file.getAbsolutePath() );
-    }
+	writePOV();
+	povFiles = new File(sketchPath() + "/pov").list();
+	povSelector.setItems( Arrays.asList(povFiles) );
 }};
-
-CameraState readPOV(String filename) {
-	CameraState pov;
-	String path = sketchPath() + "/pov/" + filename;
-	File file = new File(path);
-	try {
-		FileInputStream fi = new FileInputStream(file);
-		ObjectInputStream oi = new ObjectInputStream(fi);
-		pov = (CameraState) oi.readObject();
-		oi.close();
-		fi.close();
-		println("POV loaded : " + file.getAbsolutePath() );
-		return (CameraState)pov;
-	} catch (Exception e) {
-       e.printStackTrace();
-	   println("Error loading POV" + file.getAbsolutePath() );
-	   return camera.getState();
-    }
-}
 
 CallbackListener selectRecommended = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
 	CheckBox checkBoxes = cp5.get(CheckBox.class, "checkBoxes");
@@ -420,6 +404,42 @@ void randomize() {
 void randomizeSlider(Slider slider) {
 	float rand = random( slider.getMin(), slider.getMax() );
 	slider.setValue(rand);
+}
+
+
+void writePOV() {
+	CameraState pov = camera.getState();
+	String path = sketchPath() + "/pov/POV-" + millis() + ".pov";
+	File file = new File(path);
+	try {
+		FileOutputStream f = new FileOutputStream(file);
+		ObjectOutputStream o = new ObjectOutputStream(f);
+		o.writeObject(pov);
+		o.close();
+		println("POV saved : " + file.getAbsolutePath() );
+	} catch (Exception e) {
+       e.printStackTrace();
+	   println("Error saving POV : " + file.getAbsolutePath() );
+    }
+}
+
+CameraState readPOV(String filename) {
+	CameraState pov;
+	String path = sketchPath() + "/pov/" + filename;
+	File file = new File(path);
+	try {
+		FileInputStream fi = new FileInputStream(file);
+		ObjectInputStream oi = new ObjectInputStream(fi);
+		pov = (CameraState) oi.readObject();
+		oi.close();
+		fi.close();
+		println("POV loaded : " + file.getAbsolutePath() );
+		return (CameraState)pov;
+	} catch (Exception e) {
+       e.printStackTrace();
+	   println("Error loading POV" + file.getAbsolutePath() );
+	   return camera.getState();
+    }
 }
 
 String fileBasename(String fileName) {

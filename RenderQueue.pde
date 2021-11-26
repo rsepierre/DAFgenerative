@@ -39,10 +39,10 @@ class RenderQueue {
 
 	void startRender() {
 		String currentFile = sourceFile	;
-		String newPov = this.povList.get(0);
+		String newPOV = this.povList.get(0);
 		String newFile = this.sourceList.get(0);
 		String mode = this.modes.get(0);
-		this.target = "renders/" + this.timestamp + "/" + fileBasename(newFile) + "-" + fileBasename(newPov) + ".png";
+		this.target = "renders/" + this.timestamp + "/" + fileBasename(newFile) + "-" + fileBasename(newPOV) + ".png";
 		this.removeFirst();
 
 		// setup SVG for render
@@ -51,7 +51,7 @@ class RenderQueue {
 		}
 
 		// setup POV for render
-		camera.setState( readPOV(newPov), 0 );
+		camera.setState( readPOV(newPOV), 0 );
 
 		// setup render Mode
 		renderer.beginDraw();
