@@ -263,7 +263,6 @@ CallbackListener changePOV = new CallbackListener() { public void controlEvent(C
 }};
 
 CallbackListener changeSource = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
-	ScrollableList dropdown = cp5.get(ScrollableList.class, "sourceFile");
 	String newSource = (String)fileSelector.getItem( (int)fileSelector.getValue() ).get("name");
 	daf.setSource(newSource);
 	svgFiles = new File(sketchPath() + "/data").list();
@@ -312,10 +311,8 @@ CallbackListener capturePNG = new CallbackListener() { public void controlEvent(
 	record = 3;
 }};
 CallbackListener captureSuper = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
-	println("List of SVGs");
-	println(svgFiles);
-	println("List of POVs");
-	println(povFiles);
+	println("List of SVGs : " + svgFiles);
+	println("List of POVs : " + povFiles);
 	for (int i = 0; i < svgFiles.length; i++) {	
 		for (int j = 0; j < povFiles.length; j++) {
 			renderQueue.add("png",svgFiles[i],povFiles[j]);

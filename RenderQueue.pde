@@ -64,7 +64,7 @@ class RenderQueue {
 		renderer.save(target);
 		renderer.endDraw();
 
-		println("export finished !");
+		println("EXPORTED : target");
 		isRendering = false;
 		loop();
 	}

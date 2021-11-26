@@ -60,13 +60,7 @@ class Wavizator {
 		this.centroids = new ArrayList<PVector>();
 		for (int i = 0; i < this.nShapes; i++) {
 			RPoint centroid = this.polygon.children[i].getCentroid();
-			println("print x");
-			println(centroid.x);
-			println("print y");
-			println(centroid.y);
-			println("add");
 			this.centroids.add( new PVector(centroid.x, centroid.y));
-			println(this.centroids.get(i));
 			this.coreShapes.add(shapeFromPath(pathGroup[i]));
 		}
 	this.setupOuter(); } /*
@@ -97,7 +91,7 @@ class Wavizator {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			println("Calcs and Rendering not synchronized, frame skipped");
+			println("Error on frame render() (probably async issue)");
 		}
 	}
 
