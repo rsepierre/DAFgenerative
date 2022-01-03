@@ -1,5 +1,4 @@
 class RenderQueue {
-
 	// PApplet parent;
 	// PGraphics renderer;
 	ArrayList<String> modes; // svg, png, svgRaw
@@ -7,42 +6,43 @@ class RenderQueue {
 	ArrayList<String> povList;
 	String timestamp;
 	String target;
+	String mode;
 
 	RenderQueue() {
-		this.modes = new ArrayList<String>();
-		this.sourceList = new ArrayList<String>();
-		this.povList = new ArrayList<String>();
+		modes = new ArrayList<String>();
+		sourceList = new ArrayList<String>();
+		povList = new ArrayList<String>();
 	}
 
 	void addQueue(ArrayList<String> getModes, ArrayList<String> getsourceList, ArrayList<String> getPovList) {
 		if (getModes.size() > 0) {
-			this.modes.addAll(getModes);
-			this.sourceList.addAll(getsourceList);
-			this.povList.addAll(getPovList);
+			modes.addAll(getModes);
+			sourceList.addAll(getsourceList);
+			povList.addAll(getPovList);
 		}
 	}
 
 	void add(String getMode, String getSource, String getPov) {
-		this.modes.add(getMode);
-		this.sourceList.add(getSource);
-		this.povList.add(getPov);
-		this.timestamp = "" + year() + month() + day() + hour() + minute() + second();
+		modes.add(getMode);
+		sourceList.add(getSource);
+		povList.add(getPov);
+		timestamp = "" + year() + month() + day() + hour() + minute() + second();
 	}
 
 	void removeFirst() {
-		if(this.modes.size() > 0) {
-			this.modes.remove(0);
-			this.sourceList.remove(0);
-			this.povList.remove(0);
+		if(modes.size() > 0) {
+			modes.remove(0);
+			sourceList.remove(0);
+			povList.remove(0);
 		}
 	}
 
 	void startRender() {
-		String currentFile = sourceFile	;
-		String newPOV = this.povList.get(0);
-		String newFile = this.sourceList.get(0);
-		String mode = this.modes.get(0);
-		this.target = "renders/" + this.timestamp + "/" + fileBasename(newFile) + "-" + fileBasename(newPOV) + ".png";
+		String currentFile = sourceFile;
+		String newPOV = ( povList == null ? povList.get(0) : "customView" );
+		String newFile = ( sourceList == null ? sourceList.get(0) : currentFile  );
+		this.mode = modes.get(0);
+		this.target = "renders/" + this.timestamp + "/" + fileBasename(newFile) + "-" + fileBasename(newPOV) + "." + mode;
 		this.removeFirst();
 
 		// setup SVG for render
@@ -51,21 +51,57 @@ class RenderQueue {
 		}
 
 		// setup POV for render
-		camera.setState( readPOV(newPOV), 0 );
-
-		// setup render Mode
-		renderer.beginDraw();
-		renderer.background(backgroundColor);
+		if (newPOV != "customView") {
+			camera.setState( readPOV(newPOV), 0 );
+		}
+		
+		switch(mode) {
+			case "png":
+				// PNG rendering
+				renderer.beginDraw();
+				renderer.background(backgroundColor);
+				break;
+			case "svg":
+				beginRecord(SVG, target);
+				break;
+			case "pdf":
+				// hint(DISABLE_DEPTH_TEST);
+				beginRaw(SVG, target);
+				break;
+			case "dxf":
+				// beginRecord("nervoussystem.obj.OBJExport", target);
+				// beginRaw(DXF, target);
+				println("renderqueue.pde lign 74");
+				break;
+			default:
+				println("error : No supported mode selected");
+		}
+		
 	}
 
 	void saveRender() {
-		// save
-		saveFrame(sketchPath() + "/trash");
-		renderer.save(target);
-		renderer.endDraw();
 
-		println("EXPORTED : target");
+		switch(mode) {
+			case "png":
+				saveFrame(sketchPath() + "/trash"); // weird hack to make enable renderer to finish drawing before saving
+				renderer.save(target);
+				renderer.endDraw();
+				break;
+			case "svg":
+				endRecord();
+				break;
+			case "pdf":
+				endRaw();
+				break;
+			case "dxf":
+				endRecord();
+				// endRaw();
+				break;
+			default:
+				println("error : No supported mode selected");
+		}
+		println("EXPORTED: " + target);
 		isRendering = false;
-		loop();
+
 	}
 }

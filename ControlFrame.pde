@@ -54,6 +54,7 @@ ScrollableList fileSelector;
 Button capture2DSVGButton;
 Button captureSVGButton;
 Button capturePNGButton;
+Button captureDXFButton;
 Button captureSuperButton;
 Button savePOVButton;
 Button selectAllButton;
@@ -129,9 +130,9 @@ class ControlFrame extends PApplet {
 		.addItems( Arrays.asList(svgFiles) );
 		fileSelector.close();
 		fieldY += fieldHeight+margin;
-		capture2DSVGButton = cp5.addButton("SVG").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capture);
+		capture2DSVGButton = cp5.addButton("SVG (not working)").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureSVG);
 		fieldX += fieldWidth/2 + 4;
-		captureSVGButton = cp5.addButton("SVG RAW").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capture3D);
+		captureSVGButton = cp5.addButton("PDF (raw)").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureRaw);
 		fieldY += fieldHeight+4;
 		fieldX = sideMargin;
 		capturePNGButton = cp5.addButton("PNG").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capturePNG);
@@ -140,6 +141,8 @@ class ControlFrame extends PApplet {
 		fieldY += fieldHeight+4;
 		fieldX = sideMargin;
 		savePOVButton = cp5.addButton("savePOV").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(savePOV);
+		fieldX += fieldWidth/2 + 4;
+		captureDXFButton = cp5.addButton("save DXF").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureDXF);
 
 		// Inner Stroke
 		fieldY = sideMargin;
@@ -257,7 +260,7 @@ CallbackListener toFront = new CallbackListener() {
 
 CallbackListener changePOV = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
 	String newPOV = (String)povSelector.getItem( (int)povSelector.getValue() ).get("name");
-	camera.setState( readPOV(newPOV), 0 );
+	camera.setState( readPOV(newPOV), 300 );
 	povFiles = new File(sketchPath() + "/pov").list();
 	povSelector.setItems( Arrays.asList(povFiles) );
 }};
@@ -299,17 +302,22 @@ CallbackListener selectNone = new CallbackListener() { public void controlEvent(
 	checkBoxes.deactivateAll();
 }};
 
-CallbackListener capture = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
-	record = 1;
+CallbackListener captureSVG = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+	renderQueue.add("svg",null,null);
 }};
 
-CallbackListener capture3D = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
-	record = 2;
+CallbackListener captureRaw = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+	renderQueue.add("pdf",null,null);
 }};
 
 CallbackListener capturePNG = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
-	record = 3;
+	renderQueue.add("png",null,null);
 }};
+
+CallbackListener captureDXF = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+	renderQueue.add("dxf",null,null);
+}};
+
 CallbackListener captureSuper = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
 	println("List of SVGs : " + svgFiles);
 	println("List of POVs : " + povFiles);
@@ -440,9 +448,9 @@ CameraState readPOV(String filename) {
 }
 
 String fileBasename(String fileName) {
-   int slashIndex = fileName.lastIndexOf('/');
-   if(slashIndex == -1) { slashIndex = 0; }
-   int dotIndex = fileName.lastIndexOf('.');
-   if(dotIndex == -1) { slashIndex = fileName.length(); }
-   return fileName.substring(slashIndex, dotIndex);
+	int slashIndex = fileName.lastIndexOf('/');
+	if(slashIndex == -1) { slashIndex = 0; }
+	int dotIndex = fileName.lastIndexOf('.');
+	if(dotIndex == -1) { dotIndex = fileName.length(); }
+	return fileName.substring(slashIndex, dotIndex);
  }

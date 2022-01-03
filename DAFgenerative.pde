@@ -1,4 +1,7 @@
 import processing.svg.*;
+import processing.dxf.*;
+import processing.pdf.*;
+// import nervoussystem.obj.*;
 
 import java.util.*;
 import java.io.IOException;
