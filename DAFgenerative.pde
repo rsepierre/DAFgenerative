@@ -21,7 +21,7 @@ ControlP5 cp5;
 ControlFrame controlFrame;
 PGraphics renderer;
 
-Wavizator daf;
+Shapizator daf;
 boolean isRendering;
 RenderQueue renderQueue;
 
@@ -139,5 +139,5 @@ void setup() {
 	setCam();
 	
 	// DAF
-	daf = new Wavizator(sourceFile);
+	daf = new Shapizator(sourceFile);
 }
