@@ -1,4 +1,4 @@
-class Wavizator {
+class Shapizator {
 
 	RShape source;
 	RShape polygon;
@@ -10,7 +10,7 @@ class Wavizator {
 	int nShapes;
 	Wave[] waves;
 
-	Wavizator(String svgSource) {
+	Shapizator(String svgSource) {
 		this.setSource(svgSource);
 	}
 
