@@ -1,6 +1,4 @@
 class RenderQueue {
-	// PApplet parent;
-	// PGraphics renderer;
 	ArrayList<String> modes; // svg, png, svgRaw
 	ArrayList<String> sourceList;
 	ArrayList<String> povList;
@@ -56,22 +54,28 @@ class RenderQueue {
 		}
 		
 		switch(mode) {
-			case "png":
+			case "jpg":
 				// PNG rendering
+				if (renderer.width != w) {
+					renderer.setSize(w,h);
+				}
 				renderer.beginDraw();
 				renderer.background(backgroundColor);
 				break;
 			case "svg":
-				beginRecord(SVG, target);
+				beginRaw(SVG, target);
 				break;
 			case "pdf":
 				// hint(DISABLE_DEPTH_TEST);
-				beginRaw(SVG, target);
+				beginRaw(PDF, target);
 				break;
-			case "dxf":
-				// beginRecord("nervoussystem.obj.OBJExport", target);
-				// beginRaw(DXF, target);
-				println("renderqueue.pde lign 74");
+			case "png":
+				// TIF rendering
+				if (renderer.width != w*4) {
+					renderer.setSize(w*4,h*4);
+				}
+				renderer.beginDraw();
+				renderer.background(backgroundColor);
 				break;
 			default:
 				println("error : No supported mode selected");
@@ -82,20 +86,21 @@ class RenderQueue {
 	void saveRender() {
 
 		switch(mode) {
-			case "png":
+			case "jpg":
 				saveFrame(sketchPath() + "/trash"); // weird hack to make enable renderer to finish drawing before saving
 				renderer.save(target);
 				renderer.endDraw();
 				break;
 			case "svg":
-				endRecord();
+				endRaw();
 				break;
 			case "pdf":
 				endRaw();
 				break;
-			case "dxf":
-				endRecord();
-				// endRaw();
+			case "png":
+				saveFrame(sketchPath() + "/trash"); // weird hack to make enable renderer to finish drawing before saving
+				renderer.save(target);
+				renderer.endDraw();
 				break;
 			default:
 				println("error : No supported mode selected");

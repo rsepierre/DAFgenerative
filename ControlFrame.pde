@@ -51,10 +51,10 @@ ScrollableList povSelector;
 ScrollableList fileSelector;
 
 // Buttons
-Button capture2DSVGButton;
 Button captureSVGButton;
+Button capturePDFButton;
 Button capturePNGButton;
-Button captureDXFButton;
+Button captureJPGButton;
 Button captureSuperButton;
 Button savePOVButton;
 Button selectAllButton;
@@ -93,8 +93,6 @@ class ControlFrame extends PApplet {
 		outerStrokeColor = outerStrokeColorPicker.getColorValue();
 		background(30);
 		fill(color(255,255,0));
-		textSize(15);
-		text("* Settings marked with asterisks may cause slow rendering, especially when used in conjonction", sideMargin, height-16); 
 	}
 
 	Slider ezSlider(String id, String label, float min, float max) {
@@ -130,19 +128,19 @@ class ControlFrame extends PApplet {
 		.addItems( Arrays.asList(svgFiles) );
 		fileSelector.close();
 		fieldY += fieldHeight+margin;
-		capture2DSVGButton = cp5.addButton("SVG (not working)").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureSVG);
+		captureSVGButton = cp5.addButton("SVG").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureSVG);
 		fieldX += fieldWidth/2 + 4;
-		captureSVGButton = cp5.addButton("PDF (raw)").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureRaw);
+		capturePDFButton = cp5.addButton("PDF").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capturePDF);
 		fieldY += fieldHeight+4;
 		fieldX = sideMargin;
-		capturePNGButton = cp5.addButton("PNG").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capturePNG);
+		captureJPGButton = cp5.addButton("JPG").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureJPG);
 		fieldX += fieldWidth/2 + 4;
-		captureSuperButton = cp5.addButton("super").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureSuper);
+		capturePNGButton = cp5.addButton("PNG (HD x4)").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(capturePNG);
 		fieldY += fieldHeight+4;
 		fieldX = sideMargin;
 		savePOVButton = cp5.addButton("savePOV").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(savePOV);
 		fieldX += fieldWidth/2 + 4;
-		captureDXFButton = cp5.addButton("save DXF").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureDXF);
+		captureSuperButton = cp5.addButton("multiple").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureSuper);
 
 		// Inner Stroke
 		fieldY = sideMargin;
@@ -306,7 +304,7 @@ CallbackListener captureSVG = new CallbackListener() { public void controlEvent(
 	renderQueue.add("svg",null,null);
 }};
 
-CallbackListener captureRaw = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+CallbackListener capturePDF = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
 	renderQueue.add("pdf",null,null);
 }};
 
@@ -314,8 +312,8 @@ CallbackListener capturePNG = new CallbackListener() { public void controlEvent(
 	renderQueue.add("png",null,null);
 }};
 
-CallbackListener captureDXF = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
-	renderQueue.add("dxf",null,null);
+CallbackListener captureJPG = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {
+	renderQueue.add("jpg",null,null);
 }};
 
 CallbackListener captureSuper = new CallbackListener() { public void controlEvent(CallbackEvent theEvent) {

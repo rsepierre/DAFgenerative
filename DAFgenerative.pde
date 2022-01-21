@@ -1,6 +1,6 @@
 import processing.svg.*;
-import processing.dxf.*;
 import processing.pdf.*;
+import processing.dxf.*;
 // import nervoussystem.obj.*;
 
 import java.util.*;
@@ -78,8 +78,6 @@ float blendingHeight = 100;
 
 void draw() {
 	isRendering = (renderQueue.modes.size() > 0);
-	int currentHeight = height;
-	int currentWidth = width;
 	if(isRendering) {
 		renderQueue.startRender();
 	}
@@ -113,14 +111,13 @@ void pre() {
 
 void settings() {
 	size(1500, 1000, P3D);
-	pixelDensity(displayDensity());
 }
 
 void setup() {
 	// Settings
 	surface.setResizable(true);
 	registerMethod("pre", this);
-	renderer = createGraphics(3000, 2000, P3D);
+	renderer = createGraphics(width, height, P3D);
 	renderQueue = new RenderQueue();
 
 	hint(DISABLE_ASYNC_SAVEFRAME);
@@ -134,6 +131,10 @@ void setup() {
 	povFiles = new File(sketchPath() + "/pov").list();
 	sourceFile = svgFiles[0];
 	controlFrame = new ControlFrame(this, 847, 847, "Controls");
+
+	// Positions windows side by side
+	surface.setLocation( (847+50), 25);
+	controlFrame.getSurface().setLocation(25,25);
 	
 	// Camera 
 	setCam();
