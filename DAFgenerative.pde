@@ -15,6 +15,9 @@ import controlP5.*;
 import peasy.*;
 
 PeasyCam camera;
+PeasyDragHandler PanDragHandler;
+
+
 int record = 0;
 
 ControlP5 cp5;
@@ -106,6 +109,9 @@ void pre() {
 		h = height;
 		setScaling();
 		setCam();
+		PanDragHandler = camera.getPanDragHandler();
+		camera.setWheelHandler(null);
+		camera.setRightDragHandler(PanDragHandler);
 	}
 }
 
@@ -138,6 +144,7 @@ void setup() {
 	
 	// Camera 
 	setCam();
+	
 	
 	// DAF
 	daf = new ShapeGenerator(sourceFile);
