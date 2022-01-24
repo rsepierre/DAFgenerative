@@ -60,13 +60,23 @@ class RenderQueue {
 					renderer.setSize(w,h);
 				}
 				renderer.beginDraw();
-				renderer.background(backgroundColor);
 				break;
 			case "svg":
+				// hint(ENABLE_DEPTH_SORT);
+				// hint(DISABLE_DEPTH_MASK);
+				// hint(DISABLE_DEPTH_TEST);
+				// hint(ENABLE_STROKE_PURE);
+				hint(DISABLE_OPTIMIZED_STROKE);
+				// hint(ENABLE_STROKE_PERSPECTIVE);
 				beginRaw(SVG, target);
 				break;
 			case "pdf":
+				// hint(ENABLE_DEPTH_SORT);
+				// hint(DISABLE_DEPTH_MASK);
 				// hint(DISABLE_DEPTH_TEST);
+				// hint(ENABLE_STROKE_PURE);
+				hint(DISABLE_OPTIMIZED_STROKE);
+				// hint(ENABLE_STROKE_PERSPECTIVE);
 				beginRaw(PDF, target);
 				break;
 			case "png":
@@ -75,7 +85,6 @@ class RenderQueue {
 					renderer.setSize(w*4,h*4);
 				}
 				renderer.beginDraw();
-				renderer.background(backgroundColor);
 				break;
 			default:
 				println("error : No supported mode selected");

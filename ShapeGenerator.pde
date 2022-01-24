@@ -115,7 +115,7 @@ class ShapeGenerator {
 
 		pushMatrix();
 
-			for (int i=0; i<betweenShapes.size(); i++) {
+			for (int i=betweenShapes.size()-1; i>=0; i--) {
 				float progress = (float)i*1/(float)numberOfSteps;
 				float shapeHeight = -blendingHeight*progress;
 				float strokeWidth = lerp(pow(innerStrokeWidth,2), pow(outerStrokeWidth,2), progress);
@@ -160,8 +160,8 @@ class ShapeGenerator {
 		if (nPoints >= 0) {
 			// Drawing Settings
 			beginShape();
-			noFill();
-			// fill(backgroundColor);
+			// noFill();
+			fill(backgroundColor);
 			stroke(getColor, getAlpha);
 			strokeWeight(getStrokeWidth*scaling);
 			curveTightness(1-getCurviness);

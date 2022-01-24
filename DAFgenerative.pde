@@ -12,10 +12,12 @@ import java.io.ObjectOutputStream;
 
 import geomerative.*;
 import controlP5.*;
-import peasy.*;
 
+import peasy.*;
 PeasyCam camera;
+double[] moveInput = new double[] { 0, 0, 0 };
 PeasyDragHandler PanDragHandler;
+float PANNING_SPEED=3;
 
 
 int record = 0;
@@ -85,8 +87,14 @@ void draw() {
 		renderQueue.startRender();
 	}
 
-	background(backgroundColor);
+	noStroke();
+
+	camera.beginHUD();
+	rect(0, 0, width, height);
+	camera.endHUD();
+
 	translate(width/2, height/2);
+	move();
 	daf.render();
 
 	if(isRendering) {
@@ -96,7 +104,7 @@ void draw() {
 
 // Setup camera
 void setCam() {
-	camera = new PeasyCam(this, width/2, height/2, 0, height);
+	camera = new PeasyCam(this, 0, 0, 0, height);
 	camera.setViewport(0, 0, width, height);
 	camera.feed();
 }
@@ -117,6 +125,55 @@ void pre() {
 
 void settings() {
 	size(1500, 1000, P3D);
+}
+
+void move() {
+	camera.move(moveInput[0], moveInput[1], moveInput[2]);
+}
+
+void keyReleased() {
+	if (key == CODED) {
+		// reset X
+		if(keyCode == LEFT || keyCode == RIGHT) { moveInput[0] = 0; }
+		// reset y
+		if(keyCode == UP || keyCode == DOWN) { moveInput[1] = 0; }
+		// reset z
+		if(keyCode == SHIFT) { moveInput[2] = 0; }
+	} else {
+		// reset z
+		if (keyCode == 32) { moveInput[2] = 0; }
+  }
+}
+
+void keyPressed() {
+  if (key == CODED) {
+	switch(keyCode) {
+		// x
+		case LEFT:
+			moveInput[0] = -PANNING_SPEED;
+		break;
+		case RIGHT:
+			moveInput[0] = PANNING_SPEED;
+		break;
+		// y
+		case UP:
+			moveInput[1] = -PANNING_SPEED;
+		break;
+		case DOWN:
+			moveInput[1] = PANNING_SPEED;
+		break;
+
+		//z backward
+		case SHIFT:
+			moveInput[2] = PANNING_SPEED;
+		break;
+	}
+  } else {
+	  // z forward
+	  if (keyCode == 32) {
+		  moveInput[2] = -PANNING_SPEED;
+	  }
+  }
 }
 
 void setup() {
