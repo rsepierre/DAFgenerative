@@ -160,8 +160,13 @@ class ShapeGenerator {
 		if (nPoints >= 0) {
 			// Drawing Settings
 			beginShape();
-			// noFill();
-			fill(backgroundColor);
+
+			if (fillshape == true) {
+				fill(backgroundColor);
+			} else {
+				noFill();
+			}
+
 			stroke(getColor, getAlpha);
 			strokeWeight(getStrokeWidth*scaling);
 			curveTightness(1-getCurviness);

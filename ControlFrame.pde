@@ -6,8 +6,6 @@ int fieldY = sideMargin;
 int fieldHeight = 20;
 int fieldWidth = 255;
 
-// Controls
-
 // Text Labels
 Textlabel viewTitle;
 Textlabel backgroundColorLabel;
@@ -49,6 +47,10 @@ Slider outerShapeTwistYSlider;
 // Scrollable lists
 ScrollableList povSelector;
 ScrollableList fileSelector;
+
+// Toggles
+Toggle fillbgtoggle;
+Toggle fillshapetoggle;
 
 // Buttons
 Button captureSVGButton;
@@ -142,19 +144,6 @@ class ControlFrame extends PApplet {
 		fieldX += fieldWidth/2 + 4;
 		captureSuperButton = cp5.addButton("multiple").setPosition(fieldX,fieldY).setSize(fieldWidth/2-2,fieldHeight).onClick(captureSuper);
 
-		// Inner Stroke
-		fieldY = sideMargin;
-		fieldX = sideMargin*2+fieldWidth;
-		innerTitle = cp5.addTextlabel("innerTitle").setText("Inner Stroke").setFont(arialBig).setPosition(fieldX,fieldY);
-		fieldY += fieldHeight + margin-10;
-		innerStrokeColorLabel = cp5.addTextlabel("innerStrokeColorLabel").setText("STROKE COLOR").setFont(arialSmall).setPosition(fieldX-5,fieldY);
-		fieldY += margin+3;
-		innerStrokeColorPicker = new BetterColorPicker(cp5,"innerStrokeColor").setPosition(fieldX,fieldY).setColorValue(innerStrokeColor);
-		fieldY += 60+margin;
-		innerStrokeAlphaSlider = ezSlider("innerStrokeAlpha", "Opacity", 0, 10).setValue(innerStrokeAlpha);
-		innerStrokeWidthSlider = ezSlider("innerStrokeWidth", "Thickness", 0, 10).setValue(innerStrokeWidth);
-		innerCurvinessSlider = ezSlider("innerCurviness", "Curviness", 0.01, 1).setValue(innerCurviness);
-
 		// Outer Stroke
 		fieldY = sideMargin;
 		fieldX = sideMargin*3+fieldWidth*2;
@@ -168,8 +157,21 @@ class ControlFrame extends PApplet {
 		outerStrokeWidthSlider = ezSlider("outerStrokeWidth", "Thickness", 0, 10).setValue(outerStrokeWidth);
 		outerCurvinessSlider = ezSlider("outerCurviness", "Curviness", 0.01, 1).setValue(outerCurviness);
 
+		// Inner Stroke
+		fieldY = sideMargin;
+		fieldX = sideMargin*2+fieldWidth;
+		innerTitle = cp5.addTextlabel("innerTitle").setText("Inner Stroke").setFont(arialBig).setPosition(fieldX,fieldY);
+		fieldY += fieldHeight + margin-10;
+		innerStrokeColorLabel = cp5.addTextlabel("innerStrokeColorLabel").setText("STROKE COLOR").setFont(arialSmall).setPosition(fieldX-5,fieldY);
+		fieldY += margin+3;
+		innerStrokeColorPicker = new BetterColorPicker(cp5,"innerStrokeColor").setPosition(fieldX,fieldY).setColorValue(innerStrokeColor);
+		fieldY += 60+margin;
+		innerStrokeAlphaSlider = ezSlider("innerStrokeAlpha", "Opacity", 0, 10).setValue(innerStrokeAlpha);
+		innerStrokeWidthSlider = ezSlider("innerStrokeWidth", "Thickness", 0, 10).setValue(innerStrokeWidth);
+		innerCurvinessSlider = ezSlider("innerCurviness", "Curviness", 0.01, 1).setValue(innerCurviness);
+
 		// Global Settings
-		fieldY = 290;
+		fieldY = 300;
 		fieldX = sideMargin;
 		globalTitle = cp5.addTextlabel("globalTitle").setText("Global").setFont(arialBig).setPosition(fieldX,fieldY);
 		fieldY += fieldHeight + margin+10;
@@ -177,9 +179,18 @@ class ControlFrame extends PApplet {
 		numberOfStepsSlider = ezSlider("numberOfSteps", "Number of Lines (*)", 1, 200).setValue(numberOfSteps);
 		blendingHeightSlider = ezSlider("blendingHeight", "Depth", -1500, 1500).setValue(blendingHeight);
 		outerShapeScalingSlider = ezSlider("outerShapeScaling", "Spread", -50, 50).setValue(outerShapeScaling).onChange(changeOuterParams);
+		fieldY -= margin;
+
+
+		fillbgtoggle = cp5.addToggle("Paint Background").setPosition(fieldX,fieldY).setSize(50,20).toggle().plugTo(parent, "fillbg");
+		fillbgtoggle.getCaptionLabel().align(ControlP5.LEFT, ControlP5.CENTER).setPaddingX(60);
+		fieldX += fieldWidth + sideMargin;
+		fillshapetoggle = cp5.addToggle("Fill shape caps").setPosition(fieldX,fieldY).setSize(50,20).plugTo(parent, "fillshape");
+		fillshapetoggle.getCaptionLabel().align(ControlP5.LEFT, ControlP5.CENTER).setPaddingX(60);
+
 
 		// Wave Settings
-		fieldY = 290;
+		fieldY = 300;
 		fieldX = sideMargin*2+fieldWidth;
 		waveTitle = cp5.addTextlabel("waveTitle").setText("Wave").setFont(arialBig).setPosition(fieldX,fieldY);
 		fieldY += fieldHeight + margin+10;
@@ -189,7 +200,7 @@ class ControlFrame extends PApplet {
 		nWavesSlider = ezSlider("nWaves", "Complexity (*)", 1, 10).setValue(nWaves).onChange(changeWaves);
 
 		// Outer Shape
-		fieldY = 290;
+		fieldY = 300;
 		fieldX = sideMargin*3+fieldWidth*2;
 		outerShapeTitle = cp5.addTextlabel("outerShapeTitle").setText("OuterShape").setFont(arialBig).setPosition(fieldX,fieldY);
 		fieldY += fieldHeight + margin+10;
@@ -199,20 +210,22 @@ class ControlFrame extends PApplet {
 		outerShapeTwistYSlider = ezSlider("outerShapeTwistY", "Twist Y", -2, 2).setValue(outerShapeTwistY);
 
 		// Random
-		fieldY = 540;
+		fieldY = 570;
 		fieldX = sideMargin;
 		randomizeTitle = cp5.addTextlabel("randomizeTitle").setText("Randomize Fields").setFont(arialBig).setPosition(fieldX,fieldY);
-		fieldX += fieldWidth + sideMargin;
+		fieldY += fieldHeight + margin;
 		// View Buttons
+		randomizeButton = cp5.addButton("randomize").setPosition(fieldX,fieldY).setSize(fieldWidth,fieldHeight).onClick(randomizeClick);
+		fieldX = sideMargin;
+		fieldY += fieldHeight + margin/2;
 		selectAllButton = cp5.addButton("all").setPosition(fieldX,fieldY).setSize(fieldWidth/3-(margin*2/3),fieldHeight).onClick(selectAll);
 		fieldX += fieldWidth/3-(margin*2/3) + margin;
 		selectNoneButton = cp5.addButton("none").setPosition(fieldX,fieldY).setSize(fieldWidth/3-(margin*2/3),fieldHeight).onClick(selectNone);
 		fieldX += fieldWidth/3-(margin*2/3) + margin;
 		selectRecommendedButton = cp5.addButton("reco.").setPosition(fieldX,fieldY).setSize(fieldWidth/3-(margin*2/3),fieldHeight).onClick(selectRecommended);
-		fieldX += fieldWidth/3-(margin*2/3) + sideMargin;
-		randomizeButton = cp5.addButton("randomize").setPosition(fieldX,fieldY).setSize(fieldWidth,fieldHeight).onClick(randomizeClick);
+
 		fieldX = sideMargin;
-		fieldY += fieldHeight + margin;
+		fieldY = 570 + fieldHeight + margin;
 
 		checkBoxes = cp5.addCheckBox("checkBoxes")
 			.setPosition(fieldX,fieldY)
@@ -220,32 +233,32 @@ class ControlFrame extends PApplet {
 			.setItemsPerRow(3)
 			.setSpacingColumn(fieldWidth-fieldHeight+sideMargin)
 			.setSpacingRow(margin/2)
-			.addItem("Background Color", 1)
-			.addItem("Inner Color", 2)
-			.addItem("Outer Color", 3)
-			.addItem("Zoom", 3)
-			.addItem("Inner Opacity", 5)
-			.addItem("Outer Opacity", 6)
-			.addItem("Spacer1", 7)
-			.addItem("Inner Thickness", 8)
-			.addItem("Outer Thickness", 9)
-			.addItem("Spacer2", 10)
-			.addItem("Inner Curviness", 11)
-			.addItem("Outer Curviness", 12)
-			.addItem("Subdivision", 13)
-			.addItem("Wave Scale", 14)
-			.addItem("Circleness", 15)
-			.addItem("Number of lines", 16)
-			.addItem("Wave Length", 17)
-			.addItem("Twist Z", 18)
-			.addItem("Global Depth", 19)
-			.addItem("Wave Speed", 20)
-			.addItem("Twist X", 21)
-			.addItem("Spread", 22)
-			.addItem("Wave complexity", 23)
-			.addItem("Twist Y", 24);
-		checkBoxes.getItem(6).setVisible(false);
-		checkBoxes.getItem(9).setVisible(false);
+			.addItem("Spacer1", 0)
+			.addItem("Inner Opacity", 1)
+			.addItem("Outer Opacity", 2)
+			.addItem("Spacer2", 3)
+			.addItem("Inner Thickness", 4)
+			.addItem("Outer Thickness", 5)
+			.addItem("Zoom", 6)
+			.addItem("Inner Curviness", 7)
+			.addItem("Outer Curviness", 8)
+			.addItem("Background Color", 9)
+			.addItem("Inner Color", 10)
+			.addItem("Outer Color", 11)
+			.addItem("Subdivision", 12)
+			.addItem("Wave Scale", 13)
+			.addItem("Circleness", 14)
+			.addItem("Number of lines", 15)
+			.addItem("Wave Length", 16)
+			.addItem("Twist Z", 17)
+			.addItem("Global Depth", 18)
+			.addItem("Wave Speed", 19)
+			.addItem("Twist X", 20)
+			.addItem("Spread", 21)
+			.addItem("Wave complexity", 22)
+			.addItem("Twist Y", 23);
+		checkBoxes.getItem(0).setVisible(false);
+		checkBoxes.getItem(3).setVisible(false);
 	} // end of create controls
 } // end of control frame
 
@@ -365,30 +378,30 @@ CallbackListener selectRecommended = new CallbackListener() { public void contro
 // Randomize Controls
 void randomize() {
 	float[] checkValues = checkBoxes.getArrayValue();
-	if (checkValues[0] == 1) {
+	if (checkValues[9] == 1) {
 		randomizeSlider( cp5.get( Slider.class, "backgroundColor-red") );
 		randomizeSlider( cp5.get( Slider.class, "backgroundColor-green") );
 		randomizeSlider( cp5.get( Slider.class, "backgroundColor-blue") );
 	}
-	if (checkValues[1] == 1) {
+	if (checkValues[10] == 1) {
 		randomizeSlider( cp5.get( Slider.class, "innerStrokeColor-red") );
 		randomizeSlider( cp5.get( Slider.class, "innerStrokeColor-green") );
 		randomizeSlider( cp5.get( Slider.class, "innerStrokeColor-blue") );
 	}	
-	if (checkValues[2] == 1) {
+	if (checkValues[11] == 1) {
 		randomizeSlider( cp5.get( Slider.class, "outerStrokeColor-red") );
 		randomizeSlider( cp5.get( Slider.class, "outerStrokeColor-green") );
 		randomizeSlider( cp5.get( Slider.class, "outerStrokeColor-blue") );
 	}
-	if (checkValues[3] == 1) { randomizeSlider(zoomSlider); }
-	if (checkValues[4] == 1) { randomizeSlider(innerStrokeAlphaSlider); }
-	if (checkValues[5] == 1) { randomizeSlider(outerStrokeAlphaSlider); }
-	// if (checkValues[6] == 1) { randomizeSlider(); } it's a spacer
-	if (checkValues[7] == 1) { randomizeSlider(innerStrokeWidthSlider); }
-	if (checkValues[8] == 1) { randomizeSlider(outerStrokeWidthSlider); }
-	// if (checkValues[9] == 1) { randomizeSlider(); } it's a spacer
-	if (checkValues[10] == 1) { randomizeSlider(innerCurvinessSlider); }
-	if (checkValues[11] == 1) { randomizeSlider(outerCurvinessSlider); }
+	// if (checkValues[0] == 1) { randomizeSlider(); } it's a spacer
+	if (checkValues[1] == 1) { randomizeSlider(innerStrokeAlphaSlider); }
+	if (checkValues[2] == 1) { randomizeSlider(outerStrokeAlphaSlider); }
+	// if (checkValues[3] == 1) { randomizeSlider(); } it's a spacer
+	if (checkValues[4] == 1) { randomizeSlider(innerStrokeWidthSlider); }
+	if (checkValues[5] == 1) { randomizeSlider(outerStrokeWidthSlider); }
+	if (checkValues[6] == 1) { randomizeSlider(zoomSlider); }
+	if (checkValues[7] == 1) { randomizeSlider(innerCurvinessSlider); }
+	if (checkValues[8] == 1) { randomizeSlider(outerCurvinessSlider); }
 	if (checkValues[12] == 1) { randomizeSlider(subdivisionSlider); }
 	if (checkValues[13] == 1) { randomizeSlider(waveScaleSlider); }
 	if (checkValues[14] == 1) { randomizeSlider(outerShapeCirclenessSlider); }

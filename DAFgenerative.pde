@@ -13,7 +13,7 @@ import java.io.ObjectOutputStream;
 import geomerative.*;
 import controlP5.*;
 
-import peasy.*;
+import newpeasy.*;
 PeasyCam camera;
 double[] moveInput = new double[] { 0, 0, 0 };
 PeasyDragHandler PanDragHandler;
@@ -68,6 +68,10 @@ float outerShapeTwistX = 0;
 float outerShapeTwistY = 0;
 float outerShapeCircleness = 0.4;
 
+// Fills
+boolean fillbg = true;
+boolean fillshape = false;
+
 // Waves
 int nWaves = 4;
 float waveLength = 5;
@@ -82,6 +86,8 @@ int numberOfSteps = 15;
 float blendingHeight = 100;
 
 void draw() {
+	if (frameCount == 10) { createControlFrame(); }
+
 	isRendering = (renderQueue.modes.size() > 0);
 	if(isRendering) {
 		renderQueue.startRender();
@@ -90,11 +96,12 @@ void draw() {
 	noStroke();
 
 	camera.beginHUD();
-	rect(0, 0, width, height);
 	camera.endHUD();
 
 	translate(width/2, height/2);
 	move();
+
+	if (fillbg == true) { background(backgroundColor); }
 	daf.render();
 
 	if(isRendering) {
@@ -121,6 +128,12 @@ void pre() {
 		camera.setWheelHandler(null);
 		camera.setRightDragHandler(PanDragHandler);
 	}
+}
+
+// Create control Frame
+void createControlFrame() {
+	controlFrame = new ControlFrame(this, 847, 847, "Controls");
+	controlFrame.getSurface().setLocation(25,25);
 }
 
 void settings() {
@@ -193,15 +206,12 @@ void setup() {
 	svgFiles = new File(sketchPath() + "/data").list();
 	povFiles = new File(sketchPath() + "/pov").list();
 	sourceFile = svgFiles[0];
-	controlFrame = new ControlFrame(this, 847, 847, "Controls");
 
 	// Positions windows side by side
 	surface.setLocation( (847+50), 25);
-	controlFrame.getSurface().setLocation(25,25);
 	
 	// Camera 
 	setCam();
-	
 	
 	// DAF
 	daf = new ShapeGenerator(sourceFile);
